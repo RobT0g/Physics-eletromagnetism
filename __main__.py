@@ -17,10 +17,8 @@ def main():
             if e.type == update:
                 bars.update()
                 bars.putOnScreen()
-            '''if e.type == pygame.MOUSEBUTTONDOWN:
+            if e.type == pygame.MOUSEBUTTONDOWN:
                 bars.refresh()
-            if e.type == pygame.MOUSEBUTTONUP:
-                bars.clicked = False'''
             if pygame.key.get_pressed()[pygame.K_ESCAPE]:
                 running = False
 
