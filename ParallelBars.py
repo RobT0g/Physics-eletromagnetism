@@ -1,4 +1,3 @@
-from email.mime import base
 import pygame
 
 class Bars:
@@ -28,9 +27,11 @@ class Bars:
             'spdx': [0.15, 0.25], 
             'spdy': [0.10, 0.4]
         }
+        self.initialYSpeed = self.modsToBtn['spdy'][0]
         self.bCharge = 1.6                              #*10^-19 C
         self.mass = self.modsToBtn['char'][0]*9.1*0.25  #*10^-31 Kg
-        self.tick = 5                               #s
+        self.tick = 0.1                               #s
+        self.uptime = 0
         self.accel = self.modsToBtn['char'][0]*self.bCharge*self.modsToBtn['fiel'][0]/self.mass     #*10^-1 m/s²
         self.genGraphStuff()
         self.putOnScreen()
@@ -95,6 +96,8 @@ class Bars:
             if opt[0] == 'char' or opt[0] == 'fiel':
                 self.mass = self.modsToBtn['char'][0]*9.1*0.25
                 self.accel = self.modsToBtn['char'][0]*self.bCharge*self.modsToBtn['fiel'][0]/self.mass
+            elif opt[0] == 'spdy':
+                self.initialYSpeed = self.modsToBtn['spdy'][0]
                 print(self.accel)
         #except Exception as e:
         #    print('ERROR ', e)
@@ -137,7 +140,7 @@ class Bars:
         if self.finished == True:
             return
         self.chargePos[0] += self.modsToBtn['spdx'][0]*self.tick/self.mm
-        self.chargePos[1] -= self.modsToBtn['spdy'][0]*self.tick/self.mm
+        self.chargePos[1] = self.origin[1] + (self.initialYSpeed*self.uptime - (self.accel*self.uptime**2)/2)/self.mm
         #self.modsToBtn['spdy'][0] -= self.accel*0.1*self.tick
         if (self.chargePos[1] <= self.barpos) and (self.modsToBtn['spdy'][0] >= 0):
             self.finished = True
