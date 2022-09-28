@@ -9,7 +9,7 @@ def main():
     update = pygame.USEREVENT + 1
     pygame.time.set_timer(update, refresh)
 
-    bars = Bars(False, True)
+    bars = Bars(False, False)
 
     running = True
     while running:
