@@ -5,7 +5,7 @@ class Bars:
         self.dimensions = (75*12+32, 75*8+32)
         self.display = pygame.display.set_mode(self.dimensions)
         self.posup = posup
-        self.mm = 50/(self.dimensions[0]-100)
+        self.cm = 50/(self.dimensions[0]-100)
         self.barpos = 30
         self.chargeSign = charge
         self.origin = [50, self.dimensions[1]-80]
@@ -16,23 +16,22 @@ class Bars:
         self.btn = None
         self.finished = False
         self.modsToBtn = {
-            'char': [500, 10],                  #*e
-            'fiel': [2.85, 0.1],                #*10^-13N/C
+            'char': [500, 50],                  #*e
+            'fiel': [1.14, 0.2],                #*10^-12N/C
             'spdx': [0.25, 0.01],               #m/s
-            'spdy': [0.2, 0.01]                 #m/s
+            'spdy': [0.2, 0.02]                 #m/s
         }
         self.limitsValues = {
-            'char': [500, 600], 
-            'fiel': [2.85, 3.55], 
+            'char': [100, 600], 
+            'fiel': [1, 3.55], 
             'spdx': [0.15, 0.25], 
-            'spdy': [0.10, 0.4]
+            'spdy': [0.10, 0.8]
         }
         self.initialYSpeed = self.modsToBtn['spdy'][0]
         self.bCharge = 1.6                              #*10^-19 C
-        self.mass = self.modsToBtn['char'][0]*9.1*0.25  #*10^-31 Kg
-        self.tick = 0.1                               #s
-        self.uptime = 0
-        self.accel = self.modsToBtn['char'][0]*self.bCharge*self.modsToBtn['fiel'][0]/self.mass     #*10^-1 m/s²
+        self.mass = self.modsToBtn['char'][0]*9.1       #*10^-31 Kg
+        self.tick = 2                                 #s
+        self.accel = self.modsToBtn['char'][0]*self.bCharge*self.modsToBtn['fiel'][0]/self.mass     # m/s²
         self.genGraphStuff()
         self.putOnScreen()
     
@@ -72,8 +71,8 @@ class Bars:
     def drawAxis(self):
         pygame.draw.line(self.display, (200, 200, 200), (25, self.origin[1]-1), (self.dimensions[0]-25, self.origin[1]-1), 2)
         pygame.draw.line(self.display, (200, 200, 200), (self.origin[0]-1, 25), (self.origin[0]-1, self.dimensions[1]-25), 2)
-        pygame.draw.line(self.display, (200, 200, 200), (self.origin[0]+(50/self.mm), self.origin[1]-2), (self.origin[0]+(50/self.mm), self.origin[1]+24), 2)
-        self.display.blit((txt:=self.font.render(f'50.0', False, (200, 200, 200))), (self.origin[0]+(50/self.mm)-((s:=txt.get_size())[0]/2), self.origin[1]+25))
+        pygame.draw.line(self.display, (200, 200, 200), (self.origin[0]+(50/self.cm), self.origin[1]-2), (self.origin[0]+(50/self.cm), self.origin[1]+24), 2)
+        self.display.blit((txt:=self.font.render(f'50.0', False, (200, 200, 200))), (self.origin[0]+(50/self.cm)-((s:=txt.get_size())[0]/2), self.origin[1]+25))
 
     def clickedOn(self):
         pos = pygame.mouse.get_pos()
@@ -83,7 +82,7 @@ class Bars:
         return None
 
     def setVars(self):
-        #try:
+        try:
             opt = self.btn[self.clickedOn()][2]
             print(opt)
             if(opt[0] == 'init'):
@@ -93,15 +92,12 @@ class Bars:
                 self.modsToBtn[opt[0]][0] += self.modsToBtn[opt[0]][1]
             elif not opt[1] and self.modsToBtn[opt[0]][0] > self.limitsValues[opt[0]][0]:
                 self.modsToBtn[opt[0]][0] -= self.modsToBtn[opt[0]][1]
-            if opt[0] == 'char' or opt[0] == 'fiel':
-                self.mass = self.modsToBtn['char'][0]*9.1*0.25
-                self.accel = self.modsToBtn['char'][0]*self.bCharge*self.modsToBtn['fiel'][0]/self.mass
-            elif opt[0] == 'spdy':
-                self.initialYSpeed = self.modsToBtn['spdy'][0]
-                print(self.accel)
-        #except Exception as e:
-        #    print('ERROR ', e)
-        #    pass
+            self.accel = self.modsToBtn['char'][0]*self.bCharge*self.modsToBtn['fiel'][0]/self.mass
+            self.initialYSpeed = self.modsToBtn['spdy'][0]
+            print(self.accel)
+        except Exception as e:
+            print('ERROR ', e)
+            pass
 
 
     def showUi(self):
@@ -110,7 +106,7 @@ class Bars:
         baseSize = bs.get_size()
         self.display.blit(self.psq, (basepos[0]+baseSize[0]+10, basepos[1]+2))
         self.display.blit(self.msq, (basepos[0]+baseSize[0]+30, basepos[1]+2))
-        self.display.blit((t:=self.fontL.render(f'''Campo  {self.modsToBtn['fiel'][0]:.2f}E-13''', False, (200, 200, 200))), (basepos[0]+baseSize[0]-t.get_size()[0], basepos[1]+baseSize[1]))
+        self.display.blit((t:=self.fontL.render(f'''Campo  {self.modsToBtn['fiel'][0]:.2f}E-12''', False, (200, 200, 200))), (basepos[0]+baseSize[0]-t.get_size()[0], basepos[1]+baseSize[1]))
         self.display.blit(self.psq, (basepos[0]+baseSize[0]+10, basepos[1]+baseSize[1]+2))
         self.display.blit(self.msq, (basepos[0]+baseSize[0]+30, basepos[1]+baseSize[1]+2))
         self.display.blit((t:=self.fontL.render(f'''Vx     {self.modsToBtn['spdx'][0]:.2f}m/s''', False, (200, 200, 200))), (basepos[0]+baseSize[0]-t.get_size()[0], basepos[1]+2*baseSize[1]))
@@ -139,22 +135,24 @@ class Bars:
     def recalc(self):
         if self.finished == True:
             return
-        self.chargePos[0] += self.modsToBtn['spdx'][0]*self.tick/self.mm
-        self.chargePos[1] = self.origin[1] + (self.initialYSpeed*self.uptime - (self.accel*self.uptime**2)/2)/self.mm
-        #self.modsToBtn['spdy'][0] -= self.accel*0.1*self.tick
+        self.chargePos[0] += self.modsToBtn['spdx'][0]*self.tick/self.cm
+        self.chargePos[1] -= self.modsToBtn['spdy'][0]*self.tick/self.cm
+        self.modsToBtn['spdy'][0] -= self.accel*0.01*self.tick
         if (self.chargePos[1] <= self.barpos) and (self.modsToBtn['spdy'][0] >= 0):
             self.finished = True
             self.chargePos[1] = self.barpos
-        if (self.chargePos[1] >= self.origin[1]) and (self.modsToBtn['spdy'][0] <= 0):
+        elif (self.chargePos[1] >= self.origin[1]) and (self.modsToBtn['spdy'][0] <= 0):
             self.finished = True
             self.chargePos[1] = self.origin[1]
-            return
+        elif (self.chargePos[0] >= self.dimensions[0]-16):
+            self.finished = True
+            self.chargePos[0] = self.dimensions[0]-16
 
     def showDistances(self):
-        self.display.blit((p:=self.font.render(f'({(self.chargePos[0]-self.origin[0])*self.mm:.0f}, {(self.chargePos[1]-self.origin[1])*self.mm:.0f})', False, (200, 200, 200))),
+        self.display.blit((p:=self.font.render(f'({(self.chargePos[0]-self.origin[0])*self.cm:.0f}, {-(self.chargePos[1]-self.origin[1])*self.cm:.0f})', False, (200, 200, 200))),
             (self.chargePos[0]-2-p.get_size()[0], self.chargePos[1]-30))
-        pygame.draw.line(self.display, (9, 151, 193), (self.chargePos[0], self.chargePos[1]-1), ((self.modsToBtn['spdx'][0]*75/self.limitsValues['spdx'][1])+self.chargePos[0], self.chargePos[1]-1), 2)
-        pygame.draw.line(self.display, (9, 151, 193), (self.chargePos[0]-1, self.chargePos[1]), (self.chargePos[0]-1, (-self.modsToBtn['spdy'][0]*75/self.limitsValues['spdy'][1])+self.chargePos[1]), 2)
+        pygame.draw.line(self.display, (9, 151, 193), (self.chargePos[0], self.chargePos[1]-1), ((self.modsToBtn['spdx'][0]*75/0.5)+self.chargePos[0], self.chargePos[1]-1), 2)
+        pygame.draw.line(self.display, (9, 151, 193), (self.chargePos[0]-1, self.chargePos[1]), (self.chargePos[0]-1, (-self.modsToBtn['spdy'][0]*75/0.5)+self.chargePos[1]), 2)
 
     def update(self):
         if self.adjusting:
@@ -162,6 +160,13 @@ class Bars:
         self.recalc()
         self.putOnScreen()
         
+    def endMsg(self):
+        t = self.fontL.render(f'Finalizado! Aperte espaço', False, (200, 200, 200))
+        center = (-t.get_size()[0]/2)+self.dimensions[0]/2
+        self.display.blit(t, (center, self.dimensions[1]/2))
+        t = self.fontL.render(f'para reiniciar.', False, (200, 200, 200))
+        center = (-t.get_size()[0]/2)+self.dimensions[0]/2
+        self.display.blit(t, (center, 20+self.dimensions[1]/2))
 
     def refresh(self):
         self.setVars()
@@ -169,13 +174,15 @@ class Bars:
 
     def putOnScreen(self):
         self.display.blit(self.frame, (0, 0))
-        self.display.blit(self.orderOfCharge[0], (16, self.barpos))
+        self.display.blit(self.orderOfCharge[0], (16, self.barpos-10))
         self.display.blit(self.orderOfCharge[1], (16, self.origin[1]))
         self.drawAxis()
         self.showDistances()
         self.display.blit(self.charge, (self.chargePos[0]-15, self.chargePos[1]-15))
         if self.adjusting:
             self.showUi()
+        if self.finished:
+            self.endMsg()
         pygame.display.flip()
         
 

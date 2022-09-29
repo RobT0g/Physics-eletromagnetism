@@ -1,3 +1,6 @@
+from pygame import K_SPACE
+
+
 def main():
     import pygame
     from ParallelBars import Bars
@@ -19,7 +22,9 @@ def main():
                 bars.putOnScreen()
             if e.type == pygame.MOUSEBUTTONDOWN:
                 bars.refresh()
-            if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+            if pygame.key.get_pressed()[K_SPACE]:
+                bars = Bars(False, False)
+            if pygame.key.get_pressed()[pygame.K_ESCAPE] or e.type == pygame.QUIT:
                 running = False
 
 if __name__ == '__main__':
